@@ -93,4 +93,13 @@ void window_grub_cursor(struct window* wnd, int mode);
 /* Returns 1 when the cursor is being grubbed */
 int window_is_cursor_grubbed(struct window* wnd);
 
+/* Sets the window title */
+void window_set_title(struct window* wnd, const char* title);
+
+/* Retrieves the current window title */
+const char* window_get_title(struct window* wnd);
+
+/* Sets a window title suffix (used for live info) */
+void window_set_title_suffix(struct window* wnd, const char* suffix);
+
 #endif /* ! _WINDOW_H_ */

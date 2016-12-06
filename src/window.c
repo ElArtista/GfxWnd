@@ -1,6 +1,7 @@
 #include "gfxwnd/window.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -9,6 +10,7 @@ struct window
     GLFWwindow* wnd_handle;
     struct window_callbacks callbacks;
     void* userdata;
+    char* title, *title_suffix;
     /* Misc state */
     float cursor_pos[2], cursor_prev_pos[2];
 };
@@ -87,6 +89,7 @@ struct window* window_create(const char* title, int width, int height, int mode)
     glfwSetErrorCallback(glfw_err_cb);
 
     struct window* wnd = malloc(sizeof(struct window));
+    memset(wnd, 0, sizeof(*wnd));
 
     /* Open GL version hints */
     glfwWindowHint(GLFW_SAMPLES, 4);
@@ -149,12 +152,22 @@ struct window* window_create(const char* title, int width, int height, int mode)
     /* Load OpenGL extensions */
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
+    /* Save window title */
+    size_t title_len = strlen(title);
+    wnd->title = malloc(title_len + 1);
+    memset(wnd->title, 0, title_len + 1);
+    strncpy(wnd->title, title, title_len);
+
     return wnd;
 }
 
 void window_destroy(struct window* wnd)
 {
     glfwDestroyWindow(wnd->wnd_handle);
+    if (wnd->title_suffix)
+        free(wnd->title_suffix);
+    if (wnd->title)
+        free(wnd->title);
     free(wnd);
 
     /* Close glfw context */
@@ -239,4 +252,64 @@ void window_grub_cursor(struct window* wnd, int mode)
 int window_is_cursor_grubbed(struct window* wnd)
 {
     return glfwGetInputMode(wnd->wnd_handle, GLFW_CURSOR) == GLFW_CURSOR_DISABLED;
+}
+
+static void glfw_update_title(GLFWwindow* wnd_handle, const char* title, const char* suffix)
+{
+    /* full_title = "title" + " " + "suffix" + '\0' */
+    size_t full_title_len = 0;
+    full_title_len += title ? strlen(title) : 0;
+    ++full_title_len;
+    full_title_len += suffix ? strlen(suffix) : 0;
+    ++full_title_len;
+
+    /* Construct full title as title + " " + suffix */
+    char* full_title = malloc(full_title_len);
+    memset(full_title, 0, full_title_len);
+    if (title)
+        strcat(full_title, title);
+    if (title && suffix)
+        strcat(full_title, " ");
+    if (suffix)
+        strcat(full_title, suffix);
+
+    glfwSetWindowTitle(wnd_handle, full_title);
+    free(full_title);
+}
+
+void window_set_title(struct window* wnd, const char* title)
+{
+    if (wnd->title) {
+        free(wnd->title);
+        wnd->title = 0;
+    }
+
+    if (title) {
+        size_t title_len = strlen(title);
+        wnd->title = malloc(title_len + 1);
+        memset(wnd->title, 0, title_len + 1);
+        strncpy(wnd->title, title, title_len);
+    }
+    glfw_update_title(wnd->wnd_handle, wnd->title, wnd->title_suffix);
+}
+
+const char* window_get_title(struct window* wnd)
+{
+    return wnd->title;
+}
+
+void window_set_title_suffix(struct window* wnd, const char* suffix)
+{
+    if (wnd->title_suffix) {
+        free(wnd->title_suffix);
+        wnd->title_suffix = 0;
+    }
+
+    if (suffix) {
+        size_t suffix_len = strlen(suffix);
+        wnd->title_suffix = malloc(suffix_len + 1);
+        memset(wnd->title_suffix, 0, suffix_len + 1);
+        strncpy(wnd->title_suffix, suffix, suffix_len);
+    }
+    glfw_update_title(wnd->wnd_handle, wnd->title, wnd->title_suffix);
 }
