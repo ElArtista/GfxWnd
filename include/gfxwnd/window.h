@@ -44,6 +44,7 @@ typedef void(*scroll_fn)(struct window*, double, double);
 typedef void(*key_fn)(struct window*, int, int, int, int);
 typedef void(*char_fn)(struct window*, unsigned int);
 typedef void(*char_mods_fn)(struct window*, unsigned int, int);
+typedef void(*fb_size_fn)(struct window*, unsigned int, unsigned int);
 
 /* Set of event callbacks */
 struct window_callbacks
@@ -55,6 +56,7 @@ struct window_callbacks
     key_fn key_cb;
     char_fn char_cb;
     char_mods_fn char_mods_cb;
+    fb_size_fn fb_size_cb;
 };
 
 /* Creates new window */

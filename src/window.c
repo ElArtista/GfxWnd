@@ -82,6 +82,13 @@ static void glfw_char_mods_cb(GLFWwindow* wnd_handle, unsigned int codepoint, in
         wnd->callbacks.char_mods_cb(wnd, codepoint, mods);
 }
 
+static void glfw_fb_size_cb(GLFWwindow* wnd_handle, int w, int h)
+{
+    struct window* wnd = glfwGetWindowUserPointer(wnd_handle);
+    if (wnd->callbacks.fb_size_cb)
+        wnd->callbacks.fb_size_cb(wnd, w, h);
+}
+
 struct window* window_create(const char* title, int width, int height, int mode)
 {
     /* Initialize glfw context */
@@ -148,6 +155,7 @@ struct window* window_create(const char* title, int width, int height, int mode)
     glfwSetKeyCallback(wnd->wnd_handle, glfw_key_cb);
     glfwSetCharCallback(wnd->wnd_handle, glfw_char_cb);
     glfwSetCharModsCallback(wnd->wnd_handle, glfw_char_mods_cb);
+    glfwSetFramebufferSizeCallback(wnd->wnd_handle, glfw_fb_size_cb);
 
     /* Load OpenGL extensions */
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
