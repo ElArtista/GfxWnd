@@ -17,6 +17,15 @@ ifeq ($(TARGET_OS), Windows_NT)
 		src/win32_window.c   \
 		src/wgl_context.c    \
 		src/egl_context.c
+else ifeq ($(TARGET_OS), Darwin)
+	SRC += \
+		src/cocoa_init.m     \
+		src/cocoa_joystick.m \
+		src/cocoa_monitor.m  \
+		src/cocoa_window.m   \
+		src/cocoa_time.c     \
+		src/posix_tls.c      \
+		src/nsgl_context.m
 else
 	SRC += \
 		src/x11_init.c       \
@@ -33,6 +42,8 @@ endif
 DEFINES = _GLFW_USE_OPENGL
 ifeq ($(TARGET_OS), Windows_NT)
 	DEFINES += _GLFW_WIN32
+else ifeq ($(TARGET_OS), Darwin)
+	DEFINES += _GLFW_COCOA
 else
 	DEFINES += _GLFW_X11
 endif

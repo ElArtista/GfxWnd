@@ -44,7 +44,8 @@ void game_init(struct game_context* ctx)
     window_set_callbacks(ctx->wnd, &wnd_callbacks);
 
     /* Setup OpenGL debug handler */
-    glDebugMessageCallback(gl_debug_proc, ctx);
+    if (glDebugMessageCallback)
+        glDebugMessageCallback(gl_debug_proc, ctx);
 }
 
 void game_update(void* userdata, float dt)
