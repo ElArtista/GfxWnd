@@ -11,6 +11,7 @@ struct window
     struct window_callbacks callbacks;
     void* userdata;
     char* title, *title_suffix;
+    int vsync;
     /* Misc state */
     float cursor_pos[2], cursor_prev_pos[2];
 };
@@ -141,9 +142,6 @@ struct window* window_create(const char* title, int width, int height, int mode)
     /* Set it as the current opengl context */
     glfwMakeContextCurrent(wnd->wnd_handle);
 
-    /* Disable vSync */
-    glfwSwapInterval(0);
-
     /* Set window user pointer to this in order to be able to use our callbacks */
     glfwSetWindowUserPointer(wnd->wnd_handle, wnd);
 
@@ -159,6 +157,9 @@ struct window* window_create(const char* title, int width, int height, int mode)
 
     /* Load OpenGL extensions */
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+
+    /* Enable VSync by default */
+    window_vsync_toggle(wnd, 1);
 
     /* Save window title */
     size_t title_len = strlen(title);
@@ -185,6 +186,17 @@ void window_destroy(struct window* wnd)
 void window_set_callbacks(struct window* wnd, struct window_callbacks* callbacks)
 {
     wnd->callbacks = *callbacks;
+}
+
+int window_vsync_enabled(struct window* wnd)
+{
+    return wnd->vsync;
+}
+
+void window_vsync_toggle(struct window* wnd, int state)
+{
+    wnd->vsync = state;
+    glfwSwapInterval(!!wnd->vsync);
 }
 
 void window_update(struct window* wnd)

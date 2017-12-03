@@ -71,6 +71,12 @@ void window_set_callbacks(struct window*, struct window_callbacks*);
 /* Polls for stored events, calls the registered callbacks and updates cached state */
 void window_update(struct window*);
 
+/* Indicates the status of VSync */
+int window_vsync_enabled(struct window* wnd);
+
+/* Enables or disables VSync */
+void window_vsync_toggle(struct window* wnd, int state);
+
 /* Swaps backbuffer with front buffer */
 void window_swap_buffers(struct window* wnd);
 
