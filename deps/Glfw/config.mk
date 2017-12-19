@@ -7,7 +7,7 @@ SRC = \
 	src/monitor.c \
 	src/vulkan.c  \
 	src/window.c
-ifeq ($(TARGET_OS), Windows_NT)
+ifeq ($(TARGET_OS), Windows)
 	SRC += \
 		src/win32_init.c     \
 		src/win32_joystick.c \
@@ -40,7 +40,7 @@ else
 endif
 
 DEFINES = _GLFW_USE_OPENGL
-ifeq ($(TARGET_OS), Windows_NT)
+ifeq ($(TARGET_OS), Windows)
 	DEFINES += _GLFW_WIN32
 else ifeq ($(TARGET_OS), Darwin)
 	DEFINES += _GLFW_COCOA
