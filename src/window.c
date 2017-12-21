@@ -90,7 +90,7 @@ static void glfw_fb_size_cb(GLFWwindow* wnd_handle, int w, int h)
         wnd->callbacks.fb_size_cb(wnd, w, h);
 }
 
-struct window* window_create(const char* title, int width, int height, int mode)
+struct window* window_create(const char* title, int width, int height, int mode, struct context_params ctx_params)
 {
     /* Initialize glfw context */
     glfwInit();
@@ -99,13 +99,23 @@ struct window* window_create(const char* title, int width, int height, int mode)
     struct window* wnd = malloc(sizeof(struct window));
     memset(wnd, 0, sizeof(*wnd));
 
-    /* Open GL version hints */
-    glfwWindowHint(GLFW_SAMPLES, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    /* Pass appropriate context hints */
+    if (ctx_params.type == OPENGL) {
+        glfwWindowHint(GLFW_SAMPLES, 4);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+    } else if (ctx_params.type == OPENGL_ES) {
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+    }
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, ctx_params.version.maj);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, ctx_params.version.min);
+
+    /* Debug context hint */
+    if (ctx_params.debug)
+        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+
+    /* Window hints */
     glfwWindowHint(GLFW_FLOATING, GL_TRUE);
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
