@@ -102,8 +102,10 @@ struct window* window_create(const char* title, int width, int height, int mode,
     /* Pass appropriate context hints */
     if (ctx_params.type == OPENGL) {
         glfwWindowHint(GLFW_SAMPLES, 4);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        if (ctx_params.version.maj > 3 || (ctx_params.version.maj == 3 && ctx_params.version.min >= 2)) {
+            glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+            glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        }
         glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
     } else if (ctx_params.type == OPENGL_ES) {
         glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
@@ -166,7 +168,10 @@ struct window* window_create(const char* title, int width, int height, int mode,
     glfwSetFramebufferSizeCallback(wnd->wnd_handle, glfw_fb_size_cb);
 
     /* Load OpenGL extensions */
-    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+    if (ctx_params.type == OPENGL_ES)
+        gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress);
+    else
+        gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
     /* Enable VSync by default */
     window_vsync_toggle(wnd, 1);
